@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08040a">
+<meta name="description" content="A little heart, made of a thousand ways to say I love you.">
+<title>For You ♥</title>
+<style>
+:root{color-scheme:dark;--bg:#08040a;--pink:#ff496f;--soft:#ffb5c5}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:#fff;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#250914 0%,#10060f 36%,#08040a 75%)}
+main{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 12px 28px;position:relative;isolation:isolate}
+canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.topline{font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:#e9a0b3;opacity:.9;margin-bottom:12px;text-align:center}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(2.1rem,7vw,4.6rem);letter-spacing:-.045em;line-height:1.03;text-align:center;margin:0 0 10px;text-shadow:0 0 32px #ff17444a}
+h1 span{color:#ff6484;font-style:italic}
+.sub{font-size:clamp(.8rem,2.7vw,1rem);color:#d9b8c2;text-align:center;margin:0 0 10px}
+#heart{width:min(94vw,680px);height:min(64vh,650px);min-height:300px;display:block;overflow:visible;filter:drop-shadow(0 0 22px #ff17441b)}
+.footer{position:absolute;bottom:max(18px,env(safe-area-inset-bottom));left:12px;right:12px;text-align:center;color:#a98795;font-size:.73rem;letter-spacing:.04em}
+.footer strong{color:#f2a0b4;font-weight:500}
+.heartglow{animation:pulse 2.8s ease-in-out infinite;transform-origin:center}
+@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+@media(max-height:650px){.topline{margin-bottom:6px}h1{font-size:clamp(1.7rem,5vh,3rem)}.sub{margin-bottom:0}#heart{height:59vh;min-height:245px}.footer{font-size:.65rem}}
+@media(prefers-reduced-motion:reduce){.heartglow{animation:none}}
+</style>
+</head>
+<body>
+<main>
+<canvas id="stars" aria-hidden="true"></canvas>
+<div class="topline">a little something, just for you</div>
+<h1>My heart says <span>you.</span></h1>
+<p class="sub">In every language, in every universe. ♥</p>
+<svg id="heart" viewBox="-340 -300 680 600" role="img" aria-label="A glowing heart made of I love you written in many languages">
+<defs>
+ <radialGradient id="shine"><stop stop-color="#ffb0c2"/><stop offset=".48" stop-color="#ff416d"/><stop offset="1" stop-color="#a50036"/></radialGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="3.5"/></filter>
+ <clipPath id="heartclip"><path id="heartpath"/></clipPath>
+</defs>
+<path id="heartglow" class="heartglow" fill="#ff1d58" opacity=".16" filter="url(#blur)"/>
+<path id="heartfill" fill="#ff244f" opacity=".05"/>
+<g id="words" clip-path="url(#heartclip)"></g>
+<path id="outline" fill="none" stroke="url(#shine)" stroke-width="1.1" opacity=".48"/>
+</svg>
+<div class="footer">made with all my love <strong>♥ always yours</strong></div>
+</main>
+<script>
+(() => {
+ const svgNS='http://www.w3.org/2000/svg';
+ const phrases=['I love you','Seni seviyorum','Te amo',"Je t’aime",'Ich liebe dich','Ti amo','Eu te amo','Я тебя люблю','사랑해','愛してる','我爱你','मैं तुमसे प्यार करता हूँ',"Σ’ αγαπώ",'Ik hou van jou','Jag älskar dig','Kocham cię','ฉันรักเธอ','Anh yêu em','Aku cinta kamu','Я тебе кохаю','أحبك','אני אוהב אותך','ฉона люблю тебя','Miluji tě','Volim te'];
+ const path=document.getElementById('heartpath'),glow=document.getElementById('heartglow'),fill=document.getElementById('heartfill'),outline=document.getElementById('outline'),group=document.getElementById('words');
+ // Parametric heart curve, matching the original project's silhouette.
+ const point=t=>({x:16*Math.pow(Math.sin(t),3)*15,y:-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*15});
+ let d='';for(let i=0;i<=720;i++){const p=point(i*Math.PI*2/720);d+=(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)}d+='Z';
+ [path,glow,fill,outline].forEach(p=>p.setAttribute('d',d));
+ let seed=24017;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ const points=[];for(let i=0;i<2100;i++){const x=(rand()-.5)*470,y=(rand()-.5)*440;const xx=x/240,yy=y/220;const inside=Math.pow(xx*xx+yy*yy-1,3)-xx*xx*yy*yy*yy<=0;if(inside)points.push({x,y,delay:rand()*2.2,size:rand()>.72?11:rand()>.35?9:7,phrase:phrases[Math.floor(rand()*phrases.length)],color:rand()})}
+ points.sort((a,b)=>a.y-b.y);
+ points.forEach((p,i)=>{const t=document.createElementNS(svgNS,'text');t.textContent=p.phrase;t.setAttribute('x',p.x);t.setAttribute('y',p.y);t.setAttribute('text-anchor','middle');t.setAttribute('font-size',p.size);t.setAttribute('font-weight','700');t.setAttribute('font-family','Arial,sans-serif');t.setAttribute('fill',p.color>.82?'#ffbdca':p.color>.4?'#ff587c':'#d9194c');t.setAttribute('opacity','0');t.style.transition='opacity .75s ease, fill 1.5s ease';t.dataset.delay=p.delay;group.appendChild(t);setTimeout(()=>{t.setAttribute('opacity',p.color>.15?'.92':'.68')},250+i*1.7+p.delay*300)});
+ // Gentle shimmering highlights.
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ if(!reduced){setInterval(()=>{const t=group.children[Math.floor(Math.random()*group.children.length)];if(!t)return;const old=t.getAttribute('fill');t.setAttribute('fill','#fff0f4');setTimeout(()=>t.setAttribute('fill',old),420)},170)}
+ const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+ function resize(){const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=innerWidth*dpr;canvas.height=innerHeight*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);stars=Array.from({length:Math.min(110,Math.floor(innerWidth/8))},()=>({x:rand()*innerWidth,y:rand()*innerHeight,r:rand()*1.25+.2,a:rand()*.55+.12,s:rand()*.008+.002}))}
+ function draw(){ctx.clearRect(0,0,innerWidth,innerHeight);stars.forEach(s=>{s.a+=s.s;if(s.a>.8)s.s=-Math.abs(s.s);if(s.a<.1)s.s=Math.abs(s.s);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='rgba(255,174,196,'+s.a+')';ctx.fill()});if(!reduced)requestAnimationFrame(draw)}
+ addEventListener('resize',resize);resize();draw();
+})();
+</script>
+</body>
+</html>
